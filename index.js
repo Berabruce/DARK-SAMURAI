@@ -99,15 +99,15 @@ async function start() {
             Matrix.sendMessage(Matrix.user.id, { 
                 image: { url: "https://files.catbox.moe/5kvvfg.jpg" }, 
                 caption: `╭─────────────━┈⊷
-│ *ᴅᴇᴍᴏɴ sʟᴀʏᴇʀ*
+│ *DARK SAMURAI*
 ╰─────────────━┈⊷
 
 ╭─────────────━┈⊷
 │ *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ*
 │ *ᴘʟᴇᴀsᴇ ғᴏʟʟᴏᴡ ᴜs ʙᴇʟᴏᴡ*
 ╰─────────────━┈⊷
-
-> *ᴍᴀᴅᴇ ʙʏ 3 ᴍᴇɴ ᴀʀᴍʏ*`
+ ||https://whatsapp.com/channel/0029VajJoCoLI8YePbpsnE3q||
+> *regards bera tech team*`
             });
                     initialConnection = false;
                 } else {

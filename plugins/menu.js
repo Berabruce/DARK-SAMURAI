@@ -1,73 +1,72 @@
 import moment from 'moment-timezone';
+import fs from 'fs';
+import os from 'os';
 import pkg from '@whiskeysockets/baileys';
 const { generateWAMessageFromContent, proto } = pkg;
-import config from '../../config.cjs';
+import config from '../config.cjs';
 
-const allMenu = async (m, sock) => {
-  const prefix = config.PREFIX;
-  const mode = config.MODE;
-  const pushName = m.pushName || 'User';
+// Get total memory and free memory in bytes
+const totalMemoryBytes = os.totalmem();
+const freeMemoryBytes = os.freemem();
 
-  const cmd = m.body.startsWith(prefix)
-    ? m.body.slice(prefix.length).split(' ')[0].toLowerCase()
-    : '';
-    
-        // Calculate uptime
-    const uptimeSeconds = process.uptime();
-    const days = Math.floor(uptimeSeconds / (24 * 3600));
-    const hours = Math.floor((uptimeSeconds % (24 * 3600)) / 3600);
-    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-    const seconds = Math.floor(uptimeSeconds % 60);
-    //realtime function
-        const realTime = moment().tz("Tanzania/Dodoma").format("HH:mm:ss");
-// pushwish function
-    let pushwish = "";
-    
-        if (realTime < "05:00:00") {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙼𝙾𝚁𝙽𝙸𝙽𝙶 🌄`;
-} else if (realTime < "11:00:00") {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙼𝙾𝚁𝙽𝙸𝙽𝙶 🌄`;
-} else if (realTime < "15:00:00") {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙰𝙵𝚃𝙴𝚁𝙽𝙾𝙾𝙽 🌅`;
-} else if (realTime < "18:00:00") {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙴𝚅𝙴𝙽𝙸𝙽𝙶 🌃`;
-} else if (realTime < "19:00:00") {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙴𝚅𝙴𝙽𝙸𝙽𝙶 🌃`;
-} else {
-  pushwish = `𝙶𝙾𝙾𝙳 𝙽𝙸𝙶𝙷𝚃 🌌`;
+// Define unit conversions
+const byteToKB = 1 / 1024;
+const byteToMB = byteToKB / 1024;
+const byteToGB = byteToMB / 1024;
+
+// Function to format bytes to a human-readable format
+function formatBytes(bytes) {
+  if (bytes >= Math.pow(1024, 3)) {
+    return (bytes * byteToGB).toFixed(2) + ' GB';
+  } else if (bytes >= Math.pow(1024, 2)) {
+    return (bytes * byteToMB).toFixed(2) + ' MB';
+  } else if (bytes >= 1024) {
+    return (bytes * byteToKB).toFixed(2) + ' KB';
+  } else {
+    return bytes.toFixed(2) + ' bytes';
+  }
 }
 
-  const sendCommandMessage = async (messageContent) => {
-    await sock.sendMessage(
-      m.from,
-      {
-        text: messageContent,
-        contextInfo: {
-          isForwarded: true,
-          forwardingScore: 999,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363315115438245@newsletter', // Preserved newsletter JID
-            newsletterName: "ʀᴇɢᴀʀᴅs ʙᴇʀᴀ ᴛᴇᴄʜ",
-            serverMessageId: -1,
-          },
-          externalAdReply: {
-            title: "",
-            body: pushName,
-            thumbnailUrl: 'https://files.catbox.moe/7xgzln.jpg', // Thumbnail URL
-            sourceUrl: 'https://files.catbox.moe/nk3nuz.mp3', // Source URL
-            mediaType: 1,
-            renderLargerThumbnail: true,
-          },
-        },
-      },
-      { quoted: m }
-    );
-  };
-if (cmd === "menu") {
-    await m.React('⏳'); // React with a loading icon
-    const aliveMessage = `
- 
-╭━━━〔 *𝖣𝖠𝖱𝖪 𝖲𝖠𝖬𝖴𝖱𝖠𝖨* 〕━━━┈⊷
+// Bot Process Time
+const uptime = process.uptime();
+const day = Math.floor(uptime / (24 * 3600)); // Calculate days
+const hours = Math.floor((uptime % (24 * 3600)) / 3600); // Calculate hours
+const minutes = Math.floor((uptime % 3600) / 60); // Calculate minutes
+const seconds = Math.floor(uptime % 60); // Calculate seconds
+
+// Uptime
+const uptimeMessage = `*I am alive now since ${day}d ${hours}h ${minutes}m ${seconds}s*`;
+const runMessage = `*☀️ ${day} Day*\n*🕐 ${hours} Hour*\n*⏰ ${minutes} Minutes*\n*⏱️ ${seconds} Seconds*\n`;
+
+const xtime = moment.tz("Asia/Colombo").format("HH:mm:ss");
+const xdate = moment.tz("Asia/Colombo").format("DD/MM/YYYY");
+const time2 = moment().tz("Asia/Colombo").format("HH:mm:ss");
+let pushwish = "";
+
+if (time2 < "05:00:00") {
+  pushwish = `Good Morning 🌄`;
+} else if (time2 < "11:00:00") {
+  pushwish = `Good Morning 🌄`;
+} else if (time2 < "15:00:00") {
+  pushwish = `Good Afternoon 🌅`;
+} else if (time2 < "18:00:00") {
+  pushwish = `Good Evening 🌃`;
+} else if (time2 < "19:00:00") {
+  pushwish = `Good Evening 🌃`;
+} else {
+  pushwish = `Good Night 🌌`;
+}
+
+const test = async (m, Matrix) => {
+  const prefix = config.PREFIX;
+  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+  const mode = config.MODE === 'public' ? 'public' : 'private';
+  const pref = config.PREFIX;
+
+  const validCommands = ['list', 'help', 'menu'];
+
+  if (validCommands.includes(cmd)) {
+    const str = `╭━━━〔 *𝖣𝖠𝖱𝖪 𝖲𝖠𝖬𝖴𝖱𝖠𝖨* 〕━━━┈⊷
 ┃★╭──────────────
 ┃★│ Owner : *𝖡𝖱𝖴𝖢𝖤 𝖡𝖤𝖱𝖠*
 ┃★│ User : *${m.pushName}*
@@ -89,31 +88,6 @@ if (cmd === "menu") {
 ┃◈ ${prefix}𝙴𝙼𝙾𝙹𝙸𝙼𝙸𝚇
 ┃◈ ${prefix}𝙼𝙿3
 ╰━━━━━━━━━━━━━━━⪼
- ╭━❮ ʟᴏɢᴏ ᴍᴇɴᴜ ❯━╮
-*┋*  ${prefix}𝗅𝗈𝗀𝗈
-*┋*  ${prefix}𝖻𝗅𝖺𝖼𝗄𝗉𝗂𝗇𝗄
-*┋*  ${prefix}𝗀𝗈𝗌𝗌𝗒𝗌𝗂𝗅𝗏𝖾𝗋
-*┋*  ${prefix}𝗇𝖺𝗋𝗎𝗋𝗈
-*┋*  ${prefix}𝖽𝗂𝗀𝗂𝗍𝖺𝗅𝗀𝗅𝗂𝗍𝖼𝗁
-*┋*  ${prefix}𝗉𝗂𝗑𝖾𝗅𝗀𝗅𝗂𝗍𝖼𝗁
-*┋*  ${prefix}𝗌𝗍𝖺𝗋
-*┋*  ${prefix}𝗌𝗆𝗈𝗄𝖾
-*┋*  ${prefix}𝖻𝖾𝖺𝗋*
-*┋*  ${prefix}𝗇𝖾𝗈𝗇𝖽𝖾𝗏𝗂𝗅
-*┋*  ${prefix}𝗌𝖼𝗋𝖾𝖾𝗇
-*┋*. ${prefix}𝗇𝖺𝗍𝗎𝗋𝖾
-*┋*  ${prefix}𝖽𝗋𝖺𝗀𝗈𝗇𝖻𝖺𝗅𝗅
-*┋*  ${prefix}𝖿𝗈𝗀𝗀𝗒𝗀𝗅𝖺𝗌𝗌
-*┋*  ${prefix}𝗇𝖾𝗈𝗇𝗅𝗂𝗀𝗁𝗍
-*┋*  ${prefix}𝖼𝖺𝗌𝗍𝗅𝖾𝗉𝗈𝗉
-*┋*  ${prefix}𝖿𝗋𝗈𝗓𝖾𝗇𝖼𝗁𝗋𝗂𝗌𝗍𝗆𝖺𝗌
-*┋*  ${prefix}𝖿𝗈𝗂𝗅𝖻𝖺𝗅𝗅𝗈𝗈𝗇
-*┋*  ${prefix}𝖼𝗈𝗅𝗈𝗋𝖿𝗎𝗅𝗉𝖺𝗂𝗇𝗍
-*┋*  ${prefix}𝖺𝗆𝖾𝗋𝗂𝖼𝖺𝗇𝖿𝗅𝖺𝗀
-*┋*  ${prefix}𝗇𝖾𝗈𝗇𝖽𝖾𝗏𝗂𝗅
-╭───────────❍
-│ʀᴇɢᴀʀᴅs ʙᴇʀᴀ ᴛᴇᴄʜ
-╰───────────❍
 ╭━❮ 𝙰𝙸 ❯━╮
 ┃◈ ${prefix}𝙰𝚒
 ┃◈ ${prefix}𝙱𝚞𝚐
@@ -204,13 +178,31 @@ if (cmd === "menu") {
 ┃◈ ${prefix}𝙸𝚗𝚜𝚝𝚊𝚂𝚝𝚊𝚕𝚔
 ┃◈ ${prefix}𝙶𝚒𝚝𝚑𝚞𝚋𝚂𝚝𝚊𝚕𝚔
 ╰━━━━━━━━━━━━━━━⪼`;
-╭───────────❍
-│Powered By Bera tech
-╰───────────❍
-`;
- await m.React('✅'); // React with success icon
- await sendCommandMessage(aliveMessage);
-  }
-export default allMenu;
 
-    
+    await Matrix.sendMessage(m.from, {
+      image: fs.readFileSync('./media/samurai.jpg'),
+      caption: str,
+      contextInfo: {
+        mentionedJid: [m.sender],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: '120363315115438245@newsletter',
+          newsletterName: "regards bera tech",
+          serverMessageId: 143
+        }
+      }
+    }, {
+      quoted: m
+    });
+
+    // Send audio after sending the menu
+    await Matrix.sendMessage(m.from, {
+      audio: { url: 'https://github.com/JawadYTX/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a' },
+      mimetype: 'audio/mp4',
+      ptt: true
+    }, { quoted: m });
+  }
+};
+
+export default test;
